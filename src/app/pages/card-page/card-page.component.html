@@ -1,0 +1,52 @@
+<div class="page-wrapper">
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="https://www.pexels.com/download/video/856135/" type="video/mp4" />
+  </video>
+  <div class="overlay"></div>
+
+  <div class="card">
+    <div class="logo-section">
+      <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
+      <h1>Song Minh</h1>
+      <p class="subtitle">Thẻ thành viên</p>
+    </div>
+
+    @if (state === 'loading') {
+      <div class="loading-section">
+        <div class="spinner"></div>
+        <p>Đang tải thông tin...</p>
+      </div>
+    }
+
+    @if (state === 'ready') {
+      <div class="member-card">
+        <div class="success-badge">&#10004; Thành viên</div>
+
+        <div class="customer-info">
+          @if (customerName) {
+            <p><strong>Họ tên:</strong> {{ customerName }}</p>
+          }
+          <p><strong>SĐT:</strong> {{ customerPhone }}</p>
+          <p><strong>Mã KH:</strong> {{ customerCode }}</p>
+        </div>
+
+        <div class="barcode-container">
+          <svg #barcodeEl></svg>
+        </div>
+
+        <button class="btn-secondary" (click)="registerNew()">
+          Đăng ký mới
+        </button>
+      </div>
+    }
+
+    @if (state === 'error') {
+      <div class="error-section">
+        <div class="error-icon">&#10060;</div>
+        <h2>Không tìm thấy</h2>
+        <p class="error-message">{{ errorMessage }}</p>
+        <button class="btn-primary" routerLink="/login">Về trang chủ</button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="page-wrapper">
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="https://www.pexels.com/download/video/856135/" type="video/mp4" />
+  </video>
+  <div class="overlay"></div>
+
+  <div class="card">
+    <div class="logo-section">
+      <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
+      <h1>Song Minh</h1>
+      <p class="subtitle">Đăng ký thành viên</p>
+    </div>
+
+    @if (state === 'idle') {
+      <button class="btn-zalo" (click)="loginWithZalo()">
+        <svg class="zalo-icon" viewBox="0 0 48 48" width="24" height="24">
+          <path fill="#fff" d="M12.5 6h23A6.5 6.5 0 0 1 42 12.5v23a6.5 6.5 0 0 1-6.5 6.5h-23A6.5 6.5 0 0 1 6 35.5v-23A6.5 6.5 0 0 1 12.5 6Z"/>
+          <path fill="#0068FF" d="M13 12h22a1 1 0 0 1 1 1v22a1 1 0 0 1-1 1H13a1 1 0 0 1-1-1V13a1 1 0 0 1 1-1Z"/>
+          <text x="24" y="31" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff" font-family="Arial">Z</text>
+        </svg>
+        Đăng nhập bằng Zalo
+      </button>
+
+      <div class="divider">
+        <span>hoặc</span>
+      </div>
+
+      <button class="btn-secondary" routerLink="/complete-profile">
+        Đăng ký bằng số điện thoại
+      </button>
+    }
+
+    @if (state === 'loading') {
+      <div class="loading-section">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+      </div>
+    }
+
+    @if (state === 'error') {
+      <div class="error-section">
+        <div class="error-icon">&#10060;</div>
+        <h2>Có lỗi xảy ra</h2>
+        <p class="error-message">{{ errorMessage }}</p>
+        <button class="btn-primary" (click)="retry()">Thử lại</button>
+      </div>
+    }
+  </div>
+</div>

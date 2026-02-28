@@ -1,0 +1,65 @@
+<div class="page-wrapper">
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="https://www.pexels.com/download/video/856135/" type="video/mp4" />
+  </video>
+  <div class="overlay"></div>
+
+  <div class="card">
+    <div class="logo-section">
+      <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
+      <h1>Song Minh</h1>
+      <p class="subtitle">Hoàn tất đăng ký</p>
+    </div>
+
+    @if (zaloName) {
+      <div class="welcome-msg">
+        Xin chào <strong>{{ zaloName }}</strong>
+      </div>
+    }
+
+    @if (state === 'form') {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="phone">Số điện thoại <span class="required">*</span></label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="VD: 0901234567"
+            autocomplete="tel"
+            inputmode="numeric"
+          />
+          @if (form.get('phone')?.touched && form.get('phone')?.errors) {
+            <span class="error-text">
+              @if (form.get('phone')?.errors?.['required']) {
+                Vui lòng nhập số điện thoại
+              } @else if (form.get('phone')?.errors?.['pattern']) {
+                Số điện thoại không hợp lệ (VD: 0901234567)
+              }
+            </span>
+          }
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="form.invalid">
+          Đăng ký
+        </button>
+      </form>
+    }
+
+    @if (state === 'loading') {
+      <div class="loading-section">
+        <div class="spinner"></div>
+        <p>Đang xử lý đăng ký...</p>
+      </div>
+    }
+
+    @if (state === 'error') {
+      <div class="error-section">
+        <div class="error-icon">&#10060;</div>
+        <h2>Đăng ký thất bại</h2>
+        <p class="error-message">{{ errorMessage }}</p>
+        <button class="btn-primary" (click)="retry()">Thử lại</button>
+      </div>
+    }
+  </div>
+</div>
