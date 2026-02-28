@@ -25,10 +25,25 @@ export class LoginPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Handle bfcache restore (back button from Zalo page)
+    window.addEventListener('pageshow', (event: PageTransitionEvent) => {
+      if (event.persisted && this.state === 'loading') {
+        this.state = 'idle';
+      }
+    });
+
     // If already registered, go to card
     const saved = this.registrationService.getSavedCustomer();
     if (saved) {
       this.router.navigate(['/card', saved.customer_code]);
+      return;
+    }
+
+    // Check for Zalo error redirect
+    const errorCode = this.route.snapshot.queryParamMap.get('error_code');
+    if (errorCode) {
+      this.errorMessage = 'Đăng nhập Zalo thất bại. Vui lòng thử lại.';
+      this.state = 'error';
       return;
     }
 
