@@ -44,12 +44,15 @@
           {{ saving ? 'Đang lưu...' : 'Lưu ảnh thẻ' }}
         </button>
 
-        <button class="btn-zalo-send" (click)="saveAndOpenZalo()" [disabled]="saving">
+        <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
           Gửi đến Song Minh qua Zalo
         </button>
 
-        @if (saveSuccess) {
-          <p class="save-hint">Ảnh đã lưu! Hãy paste ảnh vào chat Zalo.</p>
+        @if (copySuccess) {
+          <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
+        }
+        @if (saveSuccess && !copySuccess) {
+          <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
         }
 
         <button class="btn-secondary" (click)="registerNew()">

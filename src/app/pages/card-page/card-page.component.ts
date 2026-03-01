@@ -25,6 +25,7 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
   customerPhone = '';
   saving = false;
   saveSuccess = false;
+  copySuccess = false;
   private barcodeRendered = false;
 
   private readonly ZALO_OA_ID = '1420769616971124037';
@@ -102,12 +103,41 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  async saveAndOpenZalo(): Promise<void> {
-    await this.saveCardImage();
-    // Small delay so user sees the download, then open Zalo OA chat
-    setTimeout(() => {
-      window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
-    }, 500);
+  async copyAndOpenZalo(): Promise<void> {
+    if (!this.cardCapture?.nativeElement || this.saving) return;
+    this.saving = true;
+    this.saveSuccess = false;
+    this.copySuccess = false;
+
+    try {
+      const canvas = await html2canvas(this.cardCapture.nativeElement, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+      });
+
+      // Copy image to clipboard
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/png');
+      });
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ]);
+      this.copySuccess = true;
+
+      // Open Zalo OA chat after short delay
+      setTimeout(() => {
+        window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
+      }, 500);
+    } catch {
+      // Clipboard API not supported (e.g. older browsers) - fallback to download
+      await this.saveCardImage();
+      setTimeout(() => {
+        window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
+      }, 500);
+    } finally {
+      this.saving = false;
+    }
   }
 
   registerNew(): void {
