@@ -12,6 +12,15 @@
     </div>
 
     @if (state === 'idle') {
+      <button class="btn-primary" routerLink="/complete-profile">
+        Đăng ký thành viên
+      </button>
+
+      <!-- TODO: Bật lại khi deploy server VN
+      <div class="divider">
+        <span>hoặc</span>
+      </div>
+
       <button class="btn-zalo" (click)="loginWithZalo()">
         <svg class="zalo-icon" viewBox="0 0 48 48" width="24" height="24">
           <path fill="#fff" d="M12.5 6h23A6.5 6.5 0 0 1 42 12.5v23a6.5 6.5 0 0 1-6.5 6.5h-23A6.5 6.5 0 0 1 6 35.5v-23A6.5 6.5 0 0 1 12.5 6Z"/>
@@ -20,14 +29,7 @@
         </svg>
         Đăng nhập bằng Zalo
       </button>
-
-      <div class="divider">
-        <span>hoặc</span>
-      </div>
-
-      <button class="btn-secondary" routerLink="/complete-profile">
-        Đăng ký bằng số điện thoại
-      </button>
+      -->
     }
 
     @if (state === 'loading') {
