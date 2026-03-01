@@ -5,12 +5,6 @@
   <div class="overlay"></div>
 
   <div class="card">
-    <div class="logo-section">
-      <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
-      <h1>Song Minh</h1>
-      <p class="subtitle">Thẻ thành viên</p>
-    </div>
-
     @if (state === 'loading') {
       <div class="loading-section">
         <div class="spinner"></div>
@@ -19,20 +13,44 @@
     }
 
     @if (state === 'ready') {
-      <div class="member-card">
-        <div class="success-badge">&#10004; Thành viên</div>
-
-        <div class="customer-info">
-          @if (customerName) {
-            <p><strong>Họ tên:</strong> {{ customerName }}</p>
-          }
-          <p><strong>SĐT:</strong> {{ customerPhone }}</p>
-          <p><strong>Mã KH:</strong> {{ customerCode }}</p>
+      <!-- Capture area for screenshot -->
+      <div #cardCapture class="card-capture">
+        <div class="logo-section">
+          <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
+          <h1>Song Minh</h1>
+          <p class="subtitle">Thẻ thành viên</p>
         </div>
 
-        <div class="barcode-container">
-          <svg #barcodeEl></svg>
+        <div class="member-card">
+          <div class="success-badge">&#10004; Thành viên</div>
+
+          <div class="customer-info">
+            @if (customerName) {
+              <p><strong>Họ tên:</strong> {{ customerName }}</p>
+            }
+            <p><strong>SĐT:</strong> {{ customerPhone }}</p>
+            <p><strong>Mã KH:</strong> {{ customerCode }}</p>
+          </div>
+
+          <div class="barcode-container">
+            <svg #barcodeEl></svg>
+          </div>
         </div>
+      </div>
+
+      <!-- Action buttons (outside capture area) -->
+      <div class="action-buttons">
+        <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
+          {{ saving ? 'Đang lưu...' : 'Lưu ảnh thẻ' }}
+        </button>
+
+        <button class="btn-zalo-send" (click)="saveAndOpenZalo()" [disabled]="saving">
+          Gửi đến Song Minh qua Zalo
+        </button>
+
+        @if (saveSuccess) {
+          <p class="save-hint">Ảnh đã lưu! Hãy paste ảnh vào chat Zalo.</p>
+        }
 
         <button class="btn-secondary" (click)="registerNew()">
           Đăng ký mới
@@ -45,7 +63,7 @@
         <div class="error-icon">&#10060;</div>
         <h2>Không tìm thấy</h2>
         <p class="error-message">{{ errorMessage }}</p>
-        <button class="btn-primary" routerLink="/login">Về trang chủ</button>
+        <button class="btn-primary" routerLink="/">Về trang chủ</button>
       </div>
     }
   </div>

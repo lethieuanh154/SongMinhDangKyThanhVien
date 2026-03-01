@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../services/registration.service';
 import JsBarcode from 'jsbarcode';
+import html2canvas from 'html2canvas';
 
 type ViewState = 'loading' | 'ready' | 'error';
 
@@ -15,13 +16,18 @@ type ViewState = 'loading' | 'ready' | 'error';
 })
 export class CardPageComponent implements OnInit, AfterViewChecked {
   @ViewChild('barcodeEl') barcodeEl!: ElementRef<SVGElement>;
+  @ViewChild('cardCapture') cardCapture!: ElementRef<HTMLDivElement>;
 
   state: ViewState = 'loading';
   errorMessage = '';
   customerCode = '';
   customerName = '';
   customerPhone = '';
+  saving = false;
+  saveSuccess = false;
   private barcodeRendered = false;
+
+  private readonly ZALO_OA_ID = '1420769616971124037';
 
   constructor(
     private route: ActivatedRoute,
@@ -32,7 +38,7 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('customer_code');
     if (!code) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/']);
       return;
     }
 
@@ -72,9 +78,41 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  async saveCardImage(): Promise<void> {
+    if (!this.cardCapture?.nativeElement || this.saving) return;
+    this.saving = true;
+    this.saveSuccess = false;
+
+    try {
+      const canvas = await html2canvas(this.cardCapture.nativeElement, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+      });
+
+      const link = document.createElement('a');
+      link.download = `SongMinh_${this.customerCode}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      this.saveSuccess = true;
+    } catch {
+      // fallback: try share API
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  async saveAndOpenZalo(): Promise<void> {
+    await this.saveCardImage();
+    // Small delay so user sees the download, then open Zalo OA chat
+    setTimeout(() => {
+      window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
+    }, 500);
+  }
+
   registerNew(): void {
     this.registrationService.clearSavedCustomer();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   private renderBarcode(): void {

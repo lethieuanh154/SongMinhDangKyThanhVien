@@ -43,6 +43,7 @@ export class CompleteProfilePageComponent implements OnInit {
     }
 
     this.form = this.fb.group({
+      name: [this.zaloName || '', [Validators.required, Validators.minLength(2)]],
       phone: ['', [Validators.required, Validators.pattern(/^0[35789]\d{8}$/)]],
     });
   }
@@ -57,7 +58,7 @@ export class CompleteProfilePageComponent implements OnInit {
     this.errorMessage = '';
 
     const phone = this.form.value.phone.trim();
-    const name = this.zaloName || '';
+    const name = this.form.value.name.trim();
 
     this.registrationService.register(name, phone, this.zaloUserId || undefined).subscribe({
       next: (res) => {

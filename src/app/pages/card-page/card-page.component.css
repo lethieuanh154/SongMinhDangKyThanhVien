@@ -1,3 +1,10 @@
+.card-capture {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
 .member-card {
   text-align: center;
 }
@@ -32,11 +39,69 @@
   border-radius: 10px;
   padding: 16px;
   border: 1px solid #e0e0e0;
-  margin-bottom: 8px;
   overflow-x: auto;
 }
 
 .barcode-container svg {
   max-width: 100%;
   height: auto;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-save {
+  width: 100%;
+  padding: 14px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: #388e3c;
+}
+
+.btn-save:disabled {
+  background: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.btn-zalo-send {
+  width: 100%;
+  padding: 14px;
+  background: #0068FF;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-zalo-send:hover {
+  background: #0055d4;
+}
+
+.btn-zalo-send:disabled {
+  background: #90b8f8;
+  cursor: not-allowed;
+}
+
+.save-hint {
+  text-align: center;
+  font-size: 13px;
+  color: #4caf50;
+  font-weight: 500;
+  margin: 0;
 }
