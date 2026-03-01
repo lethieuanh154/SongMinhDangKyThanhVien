@@ -4,9 +4,9 @@ import { CompleteProfilePageComponent } from './pages/complete-profile-page/comp
 import { CardPageComponent } from './pages/card-page/card-page.component';
 
 export const routes: Routes = [
+  { path: '', component: LoginPageComponent },
   { path: 'login', component: LoginPageComponent },
   { path: 'complete-profile', component: CompleteProfilePageComponent },
   { path: 'card/:customer_code', component: CardPageComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: '**', redirectTo: '/login' },
+  { path: '**', redirectTo: '/' },
 ];
