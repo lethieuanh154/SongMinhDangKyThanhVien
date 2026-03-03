@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ZaloService } from '../../services/zalo.service';
 import { RegistrationService } from '../../services/registration.service';
 
-type ViewState = 'form' | 'loading' | 'error';
+type ViewState = 'form' | 'loading' | 'error' | 'bonus';
 
 @Component({
   selector: 'app-complete-profile-page',
@@ -20,6 +20,7 @@ export class CompleteProfilePageComponent implements OnInit {
   errorMessage = '';
   zaloName = '';
   private zaloUserId = '';
+  private pendingCustomerCode = '';
 
   constructor(
     private fb: FormBuilder,
@@ -70,7 +71,16 @@ export class CompleteProfilePageComponent implements OnInit {
             phone: res.phone!,
           });
           this.zaloService.clearSession();
-          this.router.navigate(['/card', res.customer_code]);
+
+          if (!res.existing) {
+            this.pendingCustomerCode = res.customer_code!;
+            this.state = 'bonus';
+            setTimeout(() => {
+              this.router.navigate(['/card', this.pendingCustomerCode]);
+            }, 2000);
+          } else {
+            this.router.navigate(['/card', res.customer_code]);
+          }
         } else {
           this.errorMessage = res.message || 'Đăng ký thất bại';
           this.state = 'error';

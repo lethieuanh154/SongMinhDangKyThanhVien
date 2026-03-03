@@ -7,3 +7,42 @@
   background: #e8f5e9;
   border-radius: 8px;
 }
+
+.bonus-section {
+  text-align: center;
+  padding: 32px 0;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.bonus-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.bonus-title {
+  color: #2e7d32;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.bonus-message {
+  font-size: 16px;
+  color: #333;
+  background: #e8f5e9;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.bonus-redirect {
+  font-size: 13px;
+  color: #999;
+  margin-top: 12px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
