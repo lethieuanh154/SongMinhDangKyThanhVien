@@ -120,6 +120,17 @@
   color: #fff;
 }
 
+.zalo-follow-wrapper {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.follow-label {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 8px;
+}
+
 .save-hint {
   text-align: center;
   font-size: 13px;
@@ -149,14 +160,78 @@
   text-align: center;
   max-width: 320px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: popIn 0.3s ease-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(76, 175, 80, 0.3);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 1;
 }
 
 .bonus-icon {
-  font-size: 56px;
+  font-size: 64px;
   margin-bottom: 12px;
+  display: inline-block;
+  animation: bounceIcon 0.6s ease infinite;
 }
+
+/* Confetti */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 3px;
+  opacity: 0;
+  animation: confettiBurst 3s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.04s);
+}
+
+.confetti:nth-child(5n)   { background: #ff1744; width: 14px; height: 22px; }
+.confetti:nth-child(5n+1) { background: #ffd600; width: 18px; height: 14px; }
+.confetti:nth-child(5n+2) { background: #00e676; width: 12px; height: 24px; }
+.confetti:nth-child(5n+3) { background: #2979ff; width: 20px; height: 12px; }
+.confetti:nth-child(5n+4) { background: #d500f9; width: 14px; height: 18px; }
+
+/* Spread in all directions */
+.confetti:nth-child(1)  { --tx: -160px; --ty: -400px; }
+.confetti:nth-child(2)  { --tx: 200px;  --ty: -350px; }
+.confetti:nth-child(3)  { --tx: -280px; --ty: -150px; }
+.confetti:nth-child(4)  { --tx: 250px;  --ty: 200px; }
+.confetti:nth-child(5)  { --tx: -100px; --ty: 350px; }
+.confetti:nth-child(6)  { --tx: 50px;   --ty: -420px; }
+.confetti:nth-child(7)  { --tx: -300px; --ty: 100px; }
+.confetti:nth-child(8)  { --tx: 180px;  --ty: 280px; }
+.confetti:nth-child(9)  { --tx: 30px;   --ty: 380px; }
+.confetti:nth-child(10) { --tx: 280px;  --ty: -180px; }
+.confetti:nth-child(11) { --tx: -240px; --ty: -300px; }
+.confetti:nth-child(12) { --tx: 140px;  --ty: -380px; }
+.confetti:nth-child(13) { --tx: -200px; --ty: 250px; }
+.confetti:nth-child(14) { --tx: 300px;  --ty: 50px; }
+.confetti:nth-child(15) { --tx: -60px;  --ty: -430px; }
+.confetti:nth-child(16) { --tx: -320px; --ty: -50px; }
+.confetti:nth-child(17) { --tx: 220px;  --ty: -300px; }
+.confetti:nth-child(18) { --tx: 100px;  --ty: 320px; }
+.confetti:nth-child(19) { --tx: -180px; --ty: 300px; }
+.confetti:nth-child(20) { --tx: 260px;  --ty: -100px; }
+.confetti:nth-child(21) { --tx: -270px; --ty: -220px; }
+.confetti:nth-child(22) { --tx: 80px;   --ty: -400px; }
+.confetti:nth-child(23) { --tx: -140px; --ty: -360px; }
+.confetti:nth-child(24) { --tx: 170px;  --ty: 150px; }
+.confetti:nth-child(25) { --tx: -220px; --ty: 180px; }
+.confetti:nth-child(26) { --tx: 300px;  --ty: -250px; }
+.confetti:nth-child(27) { --tx: -50px;  --ty: 400px; }
+.confetti:nth-child(28) { --tx: 120px;  --ty: -440px; }
+.confetti:nth-child(29) { --tx: -300px; --ty: 30px; }
+.confetti:nth-child(30) { --tx: 240px;  --ty: 250px; }
 
 .bonus-title {
   color: #2e7d32;
@@ -175,12 +250,53 @@
   margin: 0;
 }
 
+.btn-bonus-dismiss {
+  margin-top: 20px;
+  padding: 12px 48px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-bonus-dismiss:hover {
+  background: #388e3c;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes popIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounceIcon {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.3) rotate(-10deg); }
+  50% { transform: scale(1) rotate(0deg); }
+  75% { transform: scale(1.3) rotate(10deg); }
+}
+
+@keyframes confettiBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) rotate(180deg) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) rotate(720deg) scale(0.8);
+  }
 }

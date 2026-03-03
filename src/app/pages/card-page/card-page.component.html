@@ -51,6 +51,11 @@
           <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
         }
 
+        <div class="zalo-follow-wrapper">
+          <p class="follow-label">Quan tâm Song Minh trên Zalo:</p>
+          <div class="zalo-follow-only-button" data-oaid="1420769616971124037" data-layout="2" data-color="blue" data-customize="true"></div>
+        </div>
+
         <button class="btn-secondary" (click)="registerNew()">
           Đăng ký mới
         </button>
@@ -69,10 +74,18 @@
 
   @if (showBonus) {
     <div class="bonus-overlay">
+      <!-- Confetti particles -->
+      <div class="confetti-container">
+        @for (i of confettiPieces; track i) {
+          <span class="confetti" [style.--i]="i"></span>
+        }
+      </div>
+
       <div class="bonus-popup">
         <div class="bonus-icon">&#127881;</div>
         <h2 class="bonus-title">Đăng ký thành công!</h2>
         <p class="bonus-message">Tặng 1000 điểm cho khách hàng đăng ký lần đầu!</p>
+        <button class="btn-bonus-dismiss" (click)="dismissBonus()">Nhận</button>
       </div>
     </div>
   }

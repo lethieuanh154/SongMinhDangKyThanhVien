@@ -27,7 +27,9 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
   saveSuccess = false;
   copySuccess = false;
   showBonus = false;
+  confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   private barcodeRendered = false;
+  private bonusTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly ZALO_OA_ID = '1420769616971124037';
 
@@ -47,7 +49,7 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
     // Check if this is a new registration (bonus overlay)
     if (history.state?.bonus) {
       this.showBonus = true;
-      setTimeout(() => this.showBonus = false, 2000);
+      this.bonusTimer = setTimeout(() => this.showBonus = false, 5000);
     }
 
     // Try localStorage first
@@ -83,7 +85,16 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
   ngAfterViewChecked(): void {
     if (this.state === 'ready' && this.barcodeEl && !this.barcodeRendered) {
       this.renderBarcode();
+      this.loadZaloSDK();
     }
+  }
+
+  private loadZaloSDK(): void {
+    if (document.getElementById('zalo-sdk')) return;
+    const script = document.createElement('script');
+    script.id = 'zalo-sdk';
+    script.src = 'https://sp.zalo.me/plugins/sdk.js';
+    document.body.appendChild(script);
   }
 
   async saveCardImage(): Promise<void> {
@@ -144,6 +155,14 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
       }, 500);
     } finally {
       this.saving = false;
+    }
+  }
+
+  dismissBonus(): void {
+    this.showBonus = false;
+    if (this.bonusTimer) {
+      clearTimeout(this.bonusTimer);
+      this.bonusTimer = null;
     }
   }
 
