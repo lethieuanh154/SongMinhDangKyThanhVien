@@ -40,10 +40,6 @@
 
       <!-- Action buttons (outside capture area) -->
       <div class="action-buttons">
-        <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
-          {{ saving ? 'Đang lưu...' : 'Lưu ảnh thẻ' }}
-        </button>
-
         <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
           Gửi đến Song Minh qua Zalo
         </button>
@@ -70,4 +66,14 @@
       </div>
     }
   </div>
+
+  @if (showBonus) {
+    <div class="bonus-overlay">
+      <div class="bonus-popup">
+        <div class="bonus-icon">&#127881;</div>
+        <h2 class="bonus-title">Đăng ký thành công!</h2>
+        <p class="bonus-message">Tặng 1000 điểm cho khách hàng đăng ký lần đầu!</p>
+      </div>
+    </div>
+  }
 </div>

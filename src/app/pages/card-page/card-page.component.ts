@@ -26,9 +26,10 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
   saving = false;
   saveSuccess = false;
   copySuccess = false;
+  showBonus = false;
   private barcodeRendered = false;
 
-  private readonly ZALO_OA_ID = '1420769616971124037';
+  readonly ZALO_OA_ID = '1420769616971124037';
 
   constructor(
     private route: ActivatedRoute,
@@ -41,6 +42,12 @@ export class CardPageComponent implements OnInit, AfterViewChecked {
     if (!code) {
       this.router.navigate(['/']);
       return;
+    }
+
+    // Check if this is a new registration (bonus overlay)
+    if (history.state?.bonus) {
+      this.showBonus = true;
+      setTimeout(() => this.showBonus = false, 2000);
     }
 
     // Try localStorage first

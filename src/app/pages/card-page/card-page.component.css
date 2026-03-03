@@ -98,10 +98,89 @@
   cursor: not-allowed;
 }
 
+.btn-zalo-follow {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  color: #0068FF;
+  border: 2px solid #0068FF;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  box-sizing: border-box;
+}
+
+.btn-zalo-follow:hover {
+  background: #0068FF;
+  color: #fff;
+}
+
 .save-hint {
   text-align: center;
   font-size: 13px;
   color: #4caf50;
   font-weight: 500;
   margin: 0;
+}
+
+.bonus-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.bonus-popup {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.3s ease-out;
+}
+
+.bonus-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.bonus-title {
+  color: #2e7d32;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.bonus-message {
+  font-size: 16px;
+  color: #333;
+  background: #e8f5e9;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
