@@ -44,16 +44,30 @@
           Gửi đến Song Minh qua Zalo
         </button>
 
+        @if (shareSuccess) {
+          <p class="save-hint">Ảnh đã chia sẻ thành công!</p>
+        }
         @if (copySuccess) {
           <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
         }
-        @if (saveSuccess && !copySuccess) {
+        @if (saveSuccess && !copySuccess && !shareSuccess) {
           <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
         }
 
+        <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
+          Lưu ảnh thẻ
+        </button>
+
         <div class="zalo-follow-wrapper">
           <p class="follow-label">Quan tâm Song Minh trên Zalo:</p>
-          <div class="zalo-follow-only-button" data-oaid="1420769616971124037" data-layout="2" data-color="blue" data-customize="true"></div>
+          @if (!isZaloInApp) {
+            <div class="zalo-follow-only-button" data-oaid="1420769616971124037" data-layout="2" data-color="blue" data-customize="true"></div>
+          }
+          @if (isZaloInApp || !zaloSdkLoaded) {
+            <a class="btn-zalo-follow" href="https://zalo.me/1420769616971124037" target="_blank" rel="noopener">
+              Quan tâm Song Minh
+            </a>
+          }
         </div>
 
         <button class="btn-secondary" (click)="registerNew()">
