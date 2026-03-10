@@ -6,89 +6,90 @@
 
   <div class="card">
     @if (state === 'loading') {
-      <div class="loading-section">
-        <div class="spinner"></div>
-        <p>Đang tải thông tin...</p>
-      </div>
+    <div class="loading-section">
+      <div class="spinner"></div>
+      <p>Đang tải thông tin...</p>
+    </div>
     }
 
     @if (state === 'ready') {
-      <!-- Capture area for screenshot -->
-      <div #cardCapture class="card-capture">
-        <div class="logo-section">
-          <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
-          <h1>Song Minh</h1>
-          <p class="subtitle">Thẻ thành viên</p>
-        </div>
-
-        <div class="member-card">
-          <div class="success-badge">&#10004; Thành viên</div>
-
-          <div class="customer-info">
-            @if (customerName) {
-              <p><strong>Họ tên:</strong> {{ customerName }}</p>
-            }
-            <p><strong>SĐT:</strong> {{ customerPhone }}</p>
-            <p><strong>Mã KH:</strong> {{ customerCode }}</p>
-          </div>
-
-          <div class="barcode-container">
-            <svg #barcodeEl></svg>
-          </div>
-        </div>
+    <!-- Capture area for screenshot -->
+    <div #cardCapture class="card-capture">
+      <div class="logo-section">
+        <img src="assets/iconSongMinh.png" alt="Song Minh" class="logo-icon" />
+        <h1>Song Minh</h1>
+        <p class="subtitle">Thẻ thành viên</p>
       </div>
 
-      <!-- Action buttons (outside capture area) -->
-      <div class="action-buttons">
-        <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
-          Quan tâm Song Minh
-        </button>
+      <div class="member-card">
+        <div class="success-badge">&#10004; Thành viên</div>
 
-        @if (shareSuccess) {
-          <p class="save-hint">Ảnh đã chia sẻ thành công!</p>
-        }
-        @if (copySuccess) {
-          <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
-        }
-        @if (saveSuccess && !copySuccess && !shareSuccess) {
-          <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
-        }
+        <div class="customer-info">
+          @if (customerName) {
+          <p><strong>Họ tên:</strong> {{ customerName }}</p>
+          }
+          <p><strong>SĐT:</strong> {{ customerPhone }}</p>
+          <p><strong>Mã KH:</strong> {{ customerCode }}</p>
+        </div>
 
-        <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
-          Lưu ảnh thẻ
-        </button>
-
-        <button class="btn-secondary" (click)="registerNew()">
-          Đăng ký mới
-        </button>
+        <div class="barcode-container">
+          <svg #barcodeEl></svg>
+        </div>
       </div>
+    </div>
+
+    <!-- Action buttons (outside capture area) -->
+    <div class="action-buttons">
+      <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
+        Lưu ảnh thẻ
+      </button>
+      <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
+        Quan tâm Song Minh
+      </button>
+
+      @if (shareSuccess) {
+      <p class="save-hint">Ảnh đã chia sẻ thành công!</p>
+      }
+      @if (copySuccess) {
+      <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
+      }
+      @if (saveSuccess && !copySuccess && !shareSuccess) {
+      <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
+      }
+
+
+
+      <button class="btn-secondary" (click)="registerNew()">
+        Đăng ký mới
+      </button>
+    </div>
     }
 
     @if (state === 'error') {
-      <div class="error-section">
-        <div class="error-icon">&#10060;</div>
-        <h2>Không tìm thấy</h2>
-        <p class="error-message">{{ errorMessage }}</p>
-        <button class="btn-primary" routerLink="/">Về trang chủ</button>
-      </div>
+    <div class="error-section">
+      <div class="error-icon">&#10060;</div>
+      <h2>Không tìm thấy</h2>
+      <p class="error-message">{{ errorMessage }}</p>
+      <button class="btn-primary" routerLink="/">Về trang chủ</button>
+    </div>
     }
   </div>
 
   @if (showBonus) {
-    <div class="bonus-overlay">
-      <!-- Confetti particles -->
-      <div class="confetti-container">
-        @for (i of confettiPieces; track i) {
-          <span class="confetti" [style.--i]="i"></span>
-        }
-      </div>
-
-      <div class="bonus-popup">
-        <div class="bonus-icon">&#127881;</div>
-        <h2 class="bonus-title">Đăng ký thành công!</h2>
-        <p class="bonus-message">Tặng 1000 điểm cho khách hàng đăng ký lần đầu!</p>
-        <button class="btn-bonus-dismiss" (click)="dismissBonus()">Nhận</button>
-      </div>
+  <div class="bonus-overlay">
+    <!-- Confetti particles -->
+    <div class="confetti-container">
+      @for (i of confettiPieces; track i) {
+      <span class="confetti" [style.--i]="i"></span>
+      }
     </div>
+
+    <div class="bonus-popup">
+      <div class="bonus-icon">&#127881;</div>
+      <h2 class="bonus-title">Đăng ký thành công!</h2>
+      <p class="bonus-message">Tặng 1000 điểm cho khách hàng đăng ký lần đầu!</p>
+      <button class="btn-bonus-dismiss" (click)="dismissBonus()">Nhận</button>
+    </div>
+  </div>
   }
 </div>
