@@ -41,7 +41,7 @@
       <!-- Action buttons (outside capture area) -->
       <div class="action-buttons">
         <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
-          Gửi đến Song Minh qua Zalo
+          Quan tâm Song Minh
         </button>
 
         @if (shareSuccess) {
@@ -57,18 +57,6 @@
         <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
           Lưu ảnh thẻ
         </button>
-
-        <div class="zalo-follow-wrapper">
-          <p class="follow-label">Quan tâm Song Minh trên Zalo:</p>
-          @if (!isZaloInApp) {
-            <div class="zalo-follow-only-button" data-oaid="1420769616971124037" data-layout="2" data-color="blue" data-customize="true"></div>
-          }
-          @if (isZaloInApp || !zaloSdkLoaded) {
-            <a class="btn-zalo-follow" href="https://zalo.me/1420769616971124037" target="_blank" rel="noopener">
-              Quan tâm Song Minh
-            </a>
-          }
-        </div>
 
         <button class="btn-secondary" (click)="registerNew()">
           Đăng ký mới

@@ -30,10 +30,8 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
-  zaloSdkLoaded = false;
   private barcodeRendered = false;
   private bonusTimer: ReturnType<typeof setTimeout> | null = null;
-  private zaloSdkCheckTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly ZALO_OA_ID = '1420769616971124037';
 
@@ -91,23 +89,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngAfterViewChecked(): void {
     if (this.state === 'ready' && this.barcodeEl && !this.barcodeRendered) {
       this.renderBarcode();
-      this.loadZaloSDK();
     }
-  }
-
-  private loadZaloSDK(): void {
-    if (document.getElementById('zalo-sdk')) return;
-    const script = document.createElement('script');
-    script.id = 'zalo-sdk';
-    script.src = 'https://sp.zalo.me/plugins/sdk.js';
-    document.body.appendChild(script);
-
-    // Check if SDK rendered the button after loading
-    this.zaloSdkCheckTimer = setTimeout(() => {
-      const btn = document.querySelector('.zalo-follow-only-button');
-      // SDK replaces the div content when it loads successfully
-      this.zaloSdkLoaded = !!(btn && btn.children.length > 0);
-    }, 3000);
   }
 
   private async captureCanvas(): Promise<HTMLCanvasElement> {
@@ -174,29 +156,31 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
       }
 
-      // Normal browser: copy to clipboard then open Zalo
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ]);
-      this.copySuccess = true;
-
-      setTimeout(() => {
-        window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
-      }, 500);
+      // Normal browser: copy to clipboard then open Zalo OA
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob }),
+        ]);
+        this.copySuccess = true;
+      } catch {
+        // Clipboard not supported - download instead
+        await this.saveCardImage();
+      }
     } catch {
-      // Clipboard API not supported - fallback to download
-      await this.saveCardImage();
-      setTimeout(() => {
-        window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
-      }, 500);
+      // Canvas capture failed - still open Zalo
     } finally {
       this.saving = false;
+      // Always open Zalo OA page (for "Quan tâm")
+      if (!this.shareSuccess) {
+        setTimeout(() => {
+          window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
+        }, 500);
+      }
     }
   }
 
   ngOnDestroy(): void {
     if (this.bonusTimer) clearTimeout(this.bonusTimer);
-    if (this.zaloSdkCheckTimer) clearTimeout(this.zaloSdkCheckTimer);
   }
 
   dismissBonus(): void {
