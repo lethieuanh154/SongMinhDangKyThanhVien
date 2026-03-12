@@ -93,11 +93,56 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   private async captureCanvas(): Promise<HTMLCanvasElement> {
-    return html2canvas(this.cardCapture.nativeElement, {
+    const el = this.cardCapture.nativeElement;
+
+    // Force a fixed width so html2canvas renders at a consistent size
+    const originalWidth = el.style.width;
+    el.style.width = '380px';
+
+    const canvas = await html2canvas(el, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
+      onclone: (clonedDoc: Document) => {
+        // html2canvas doesn't support clamp() — apply fixed styles in the clone
+        const root = clonedDoc.querySelector('.card-capture') as HTMLElement;
+        if (!root) return;
+
+        // Logo
+        const logo = root.querySelector('.logo-icon') as HTMLElement;
+        if (logo) { logo.style.width = '72px'; logo.style.height = '72px'; }
+
+        const h1 = root.querySelector('.logo-section h1') as HTMLElement;
+        if (h1) h1.style.fontSize = '26px';
+
+        const subtitle = root.querySelector('.subtitle') as HTMLElement;
+        if (subtitle) subtitle.style.fontSize = '14px';
+
+        // Badge
+        const badge = root.querySelector('.success-badge') as HTMLElement;
+        if (badge) badge.style.fontSize = '14px';
+
+        // Customer info
+        root.querySelectorAll('.customer-info p').forEach((p) => {
+          (p as HTMLElement).style.fontSize = '15px';
+        });
+
+        // Barcode container — prevent overflow clipping
+        const barcodeBox = root.querySelector('.barcode-container') as HTMLElement;
+        if (barcodeBox) { barcodeBox.style.overflow = 'visible'; }
+
+        // Barcode SVG — ensure it fits
+        const svg = root.querySelector('.barcode-container svg') as SVGElement;
+        if (svg) {
+          svg.style.maxWidth = '100%';
+          svg.style.height = 'auto';
+        }
+      },
     });
+
+    // Restore original width
+    el.style.width = originalWidth;
+    return canvas;
   }
 
   private async canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -198,14 +243,15 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private renderBarcode(): void {
     if (!this.customerCode || !this.barcodeEl?.nativeElement) return;
+    const isSmallScreen = window.innerWidth < 360;
     try {
       JsBarcode(this.barcodeEl.nativeElement, this.customerCode, {
         format: 'CODE128',
-        width: 2,
-        height: 80,
+        width: isSmallScreen ? 1.5 : 2,
+        height: isSmallScreen ? 60 : 80,
         displayValue: true,
-        fontSize: 16,
-        margin: 10,
+        fontSize: isSmallScreen ? 12 : 16,
+        margin: isSmallScreen ? 5 : 10,
       });
       this.barcodeRendered = true;
     } catch {

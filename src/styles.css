@@ -4,6 +4,13 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Prevent browser/OS auto text inflation on mobile */
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   min-height: 100vh;
