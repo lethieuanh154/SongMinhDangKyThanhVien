@@ -30,6 +30,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
+  private isIOS = false;
   private barcodeRendered = false;
   private bonusTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -43,6 +44,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     this.isZaloInApp = /Zalo/i.test(navigator.userAgent);
+    this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     const code = this.route.snapshot.paramMap.get('customer_code');
     if (!code) {
@@ -158,16 +160,36 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     try {
       const canvas = await this.captureCanvas();
+      const blob = await this.canvasToBlob(canvas);
 
-      // In Zalo in-app browser, try Web Share API first
-      if (this.isZaloInApp && navigator.share) {
-        const blob = await this.canvasToBlob(canvas);
+      // Try Web Share API first (works on both iOS and Android)
+      if (navigator.share) {
         const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
-        await navigator.share({ files: [file] });
-        this.saveSuccess = true;
-        return;
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          this.saveSuccess = true;
+          return;
+        }
       }
 
+      // iOS fallback: open image in new tab for long-press save
+      if (this.isIOS) {
+        const url = URL.createObjectURL(blob);
+        const w = window.open('', '_blank');
+        if (w) {
+          w.document.write(`
+            <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>Giữ ảnh để lưu</title>
+            <style>body{margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#f5f5f5;font-family:sans-serif}
+            p{color:#333;font-size:16px;margin-bottom:12px}img{max-width:95%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15)}</style></head>
+            <body><p>Nhấn giữ ảnh để lưu về máy</p><img src="${url}"></body></html>`);
+          w.document.close();
+          this.saveSuccess = true;
+          return;
+        }
+      }
+
+      // Android / Desktop: download via <a> tag
       const link = document.createElement('a');
       link.download = `SongMinh_${this.customerCode}.png`;
       link.href = canvas.toDataURL('image/png');
@@ -191,8 +213,8 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       const canvas = await this.captureCanvas();
       const blob = await this.canvasToBlob(canvas);
 
-      // In Zalo in-app browser: use Web Share API (clipboard not available)
-      if (this.isZaloInApp && navigator.share) {
+      // Try Web Share API first (works on iOS and Android)
+      if (navigator.share) {
         const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
         if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file] });

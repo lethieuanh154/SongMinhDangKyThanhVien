@@ -41,7 +41,7 @@
     <!-- Action buttons (outside capture area) -->
     <div class="action-buttons">
       <button class="btn-save" (click)="saveCardImage()" [disabled]="saving">
-        Lưu ảnh thẻ
+        {{ saving ? 'Đang xử lý...' : 'Lưu ảnh thẻ' }}
       </button>
       <button class="btn-zalo-send" (click)="copyAndOpenZalo()" [disabled]="saving">
         Quan tâm Song Minh
