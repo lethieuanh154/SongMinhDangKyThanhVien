@@ -70,16 +70,6 @@
     }
   </div>
 
-  @if (showImageModal) {
-  <div class="image-modal-overlay" (click)="dismissImageModal()">
-    <div class="image-modal" (click)="$event.stopPropagation()">
-      <p class="image-modal-hint">Nhấn giữ ảnh để lưu về máy</p>
-      <img [src]="modalImageUrl" class="image-modal-img" alt="Thẻ thành viên" />
-      <button class="btn-primary image-modal-btn" (click)="dismissImageModal()">Đã lưu xong</button>
-    </div>
-  </div>
-  }
-
   @if (showBonus) {
   <div class="bonus-overlay">
     <!-- Confetti particles -->
