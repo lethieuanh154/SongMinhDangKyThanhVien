@@ -172,12 +172,6 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.cardCapture?.nativeElement || this.saving) return;
     this.hintMessage = '';
 
-    // iOS Zalo: no save/download/clipboard API works — guide user to Safari
-    if (this.isZaloInApp && this.isIOS) {
-      this.hintMessage = 'Nhấn ⋯ (góc phải) → Mở trình duyệt → Lưu ảnh';
-      return;
-    }
-
     this.saving = true;
 
     try {
@@ -185,7 +179,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       const blob = await this.canvasToBlob(canvas);
 
       if (this.isZaloInApp) {
-        // Android Zalo: try share API first
+        // Zalo WebView: try share API first (both iOS & Android)
         try {
           const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
           await navigator.share({ files: [file] });
@@ -193,6 +187,12 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
           return;
         } catch (e: any) {
           if (e?.name === 'AbortError') return;
+        }
+
+        if (this.isIOS) {
+          // iOS Zalo: share failed, guide user to screenshot
+          this.hintMessage = 'Chụp màn hình để lưu thẻ thành viên';
+          return;
         }
 
         // Android Zalo fallback: download via data URL
