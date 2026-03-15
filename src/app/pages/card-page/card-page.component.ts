@@ -185,36 +185,36 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       const blob = await this.canvasToBlob(canvas);
 
       if (this.isZaloInApp) {
-        // Zalo WebView: copy to clipboard → user pastes into Zalo chat
+        // Zalo WebView: try share API first (system share sheet)
+        try {
+          const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
+          await navigator.share({ files: [file] });
+          this.saveSuccess = true;
+          return;
+        } catch (e: any) {
+          if (e?.name === 'AbortError') return;
+        }
+
+        if (!this.isIOS) {
+          // Android Zalo: download via data URL → saves to Zalo images
+          const dataUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = dataUrl;
+          link.download = `SongMinh_${this.customerCode}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          this.saveSuccess = true;
+          return;
+        }
+
+        // iOS Zalo: try clipboard as last resort
         try {
           await navigator.clipboard.write([
             new ClipboardItem({ 'image/png': blob }),
           ]);
           this.copySuccess = true;
-          return;
-        } catch { /* clipboard not available */ }
-
-        // Fallback: try Web Share API (share sheet → "Save Image")
-        try {
-          const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
-          if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file] });
-            this.saveSuccess = true;
-            return;
-          }
-        } catch (e: any) {
-          if (e?.name === 'AbortError') return;
-        }
-
-        // Last fallback: data URL download
-        const dataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `SongMinh_${this.customerCode}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        this.saveSuccess = true;
+        } catch { /* nothing works on iOS Zalo */ }
         return;
       }
 
