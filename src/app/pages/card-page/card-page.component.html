@@ -44,15 +44,9 @@
         Quan tâm Song Minh
       </button>
 
-      @if (copySuccess) {
-      <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
+      @if (hintMessage) {
+      <p class="save-hint">{{ hintMessage }}</p>
       }
-      @if (saveSuccess && !copySuccess) {
-      <p class="save-hint">Ảnh đã lưu!</p>
-      }
-
-
-
 
       <button class="btn-secondary" (click)="registerNew()">
         Đăng ký mới

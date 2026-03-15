@@ -24,8 +24,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   customerName = '';
   customerPhone = '';
   saving = false;
-  saveSuccess = false;
-  copySuccess = false;
+  hintMessage = '';
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
@@ -96,17 +95,20 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   private async captureCanvas(): Promise<HTMLCanvasElement> {
     const el = this.cardCapture.nativeElement;
 
-    // Pre-convert logo to data URL so html2canvas can render it reliably
+    // Pre-convert logo to data URL and swap on the ORIGINAL element
+    // (setting in onclone is too late — useCORS re-fetches with crossOrigin header
+    //  which fails if the server doesn't return CORS headers for static assets)
     const originalLogo = el.querySelector('.logo-icon') as HTMLImageElement;
-    let logoDataUrl = '';
+    let originalLogoSrc = '';
     if (originalLogo?.complete && originalLogo.naturalWidth > 0) {
       try {
         const c = document.createElement('canvas');
         c.width = originalLogo.naturalWidth;
         c.height = originalLogo.naturalHeight;
         c.getContext('2d')!.drawImage(originalLogo, 0, 0);
-        logoDataUrl = c.toDataURL('image/png');
-      } catch { /* CORS — logo will be missing */ }
+        originalLogoSrc = originalLogo.src;
+        originalLogo.src = c.toDataURL('image/png');
+      } catch { /* keep original src */ }
     }
 
     // Force a fixed width so html2canvas renders at a consistent size
@@ -122,13 +124,8 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
         const root = clonedDoc.querySelector('.card-capture') as HTMLElement;
         if (!root) return;
 
-        // Logo — use pre-converted data URL
-        const logo = root.querySelector('.logo-icon') as HTMLImageElement;
-        if (logo) {
-          if (logoDataUrl) logo.src = logoDataUrl;
-          logo.style.width = '72px';
-          logo.style.height = '72px';
-        }
+        const logo = root.querySelector('.logo-icon') as HTMLElement;
+        if (logo) { logo.style.width = '72px'; logo.style.height = '72px'; }
 
         const h1 = root.querySelector('.logo-section h1') as HTMLElement;
         if (h1) h1.style.fontSize = '26px';
@@ -136,23 +133,19 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
         const subtitle = root.querySelector('.subtitle') as HTMLElement;
         if (subtitle) subtitle.style.fontSize = '14px';
 
-        // Badge
         const badge = root.querySelector('.success-badge') as HTMLElement;
-        if (badge) badge.style.fontSize = '14px';
+        if (badge) { badge.style.fontSize = '14px'; badge.style.whiteSpace = 'nowrap'; }
 
-        // Customer info
         root.querySelectorAll('.customer-info p').forEach((p) => {
           (p as HTMLElement).style.fontSize = '15px';
         });
 
-        // Barcode container
         const barcodeBox = root.querySelector('.barcode-container') as HTMLElement;
         if (barcodeBox) {
           barcodeBox.style.overflow = 'visible';
           barcodeBox.style.textAlign = 'center';
         }
 
-        // Barcode SVG — center and fit
         const svg = root.querySelector('.barcode-container svg') as SVGElement;
         if (svg) {
           svg.style.maxWidth = '100%';
@@ -163,8 +156,9 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       },
     });
 
-    // Restore original width
+    // Restore originals
     el.style.width = originalWidth;
+    if (originalLogoSrc) originalLogo.src = originalLogoSrc;
     return canvas;
   }
 
@@ -176,45 +170,40 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   async saveCardImage(): Promise<void> {
     if (!this.cardCapture?.nativeElement || this.saving) return;
+    this.hintMessage = '';
+
+    // iOS Zalo: no save/download/clipboard API works — guide user to Safari
+    if (this.isZaloInApp && this.isIOS) {
+      this.hintMessage = 'Nhấn ⋯ (góc phải) → Mở trình duyệt → Lưu ảnh';
+      return;
+    }
+
     this.saving = true;
-    this.saveSuccess = false;
-    this.copySuccess = false;
 
     try {
       const canvas = await this.captureCanvas();
       const blob = await this.canvasToBlob(canvas);
 
       if (this.isZaloInApp) {
-        // Zalo WebView: try share API first (system share sheet)
+        // Android Zalo: try share API first
         try {
           const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
           await navigator.share({ files: [file] });
-          this.saveSuccess = true;
+          this.hintMessage = 'Ảnh đã lưu!';
           return;
         } catch (e: any) {
           if (e?.name === 'AbortError') return;
         }
 
-        if (!this.isIOS) {
-          // Android Zalo: download via data URL → saves to Zalo images
-          const dataUrl = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.href = dataUrl;
-          link.download = `SongMinh_${this.customerCode}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          this.saveSuccess = true;
-          return;
-        }
-
-        // iOS Zalo: try clipboard as last resort
-        try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob }),
-          ]);
-          this.copySuccess = true;
-        } catch { /* nothing works on iOS Zalo */ }
+        // Android Zalo fallback: download via data URL
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `SongMinh_${this.customerCode}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.hintMessage = 'Ảnh đã lưu!';
         return;
       }
 
@@ -227,7 +216,9 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       link.click();
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.saveSuccess = true;
+      this.hintMessage = this.isIOS
+        ? 'Ảnh đã tải! Mở ảnh → Sao chép → Dán vào chat Zalo'
+        : 'Ảnh đã lưu!';
     } catch {
       // silently fail
     } finally {
@@ -237,7 +228,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   async copyAndOpenZalo(): Promise<void> {
     if (this.saving) return;
-    this.copySuccess = false;
+    this.hintMessage = '';
 
     const zaloUrl = `https://zalo.me/${this.ZALO_OA_ID}`;
 
@@ -259,7 +250,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob }),
         ]);
-        this.copySuccess = true;
+        this.hintMessage = 'Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.';
       } catch {
         // Clipboard copy failed - Zalo is already open, that's OK
       } finally {
