@@ -47,14 +47,18 @@
         Quan tâm Song Minh
       </button>
 
-      @if (shareSuccess) {
-      <p class="save-hint">Ảnh đã chia sẻ thành công!</p>
-      }
       @if (copySuccess) {
       <p class="save-hint">Ảnh đã copy! Hãy paste (dán) ảnh vào chat Zalo.</p>
       }
-      @if (saveSuccess && !copySuccess && !shareSuccess) {
-      <p class="save-hint">Ảnh đã lưu! Hãy gửi ảnh vào chat Zalo.</p>
+      @if (saveSuccess && !copySuccess) {
+      <p class="save-hint">Ảnh đã lưu!</p>
+      }
+
+      @if (previewImageUrl) {
+      <div class="preview-section">
+        <p class="save-hint">Nhấn giữ ảnh bên dưới để lưu về máy</p>
+        <img [src]="previewImageUrl" class="preview-image" alt="Thẻ thành viên" />
+      </div>
       }
 
 

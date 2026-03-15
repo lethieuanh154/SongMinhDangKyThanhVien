@@ -26,7 +26,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   saving = false;
   saveSuccess = false;
   copySuccess = false;
-  shareSuccess = false;
+  previewImageUrl: string | null = null;
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
@@ -157,36 +157,17 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.cardCapture?.nativeElement || this.saving) return;
     this.saving = true;
     this.saveSuccess = false;
+    this.previewImageUrl = null;
 
     try {
       const canvas = await this.captureCanvas();
-      const blob = await this.canvasToBlob(canvas);
 
-      // Try Web Share API first (works on both iOS and Android)
-      if (navigator.share) {
-        const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file] });
-          this.saveSuccess = true;
-          return;
-        }
-      }
-
-      // iOS fallback: open image in new tab for long-press save
-      if (this.isIOS) {
-        const url = URL.createObjectURL(blob);
-        const w = window.open('', '_blank');
-        if (w) {
-          w.document.write(`
-            <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>Giữ ảnh để lưu</title>
-            <style>body{margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#f5f5f5;font-family:sans-serif}
-            p{color:#333;font-size:16px;margin-bottom:12px}img{max-width:95%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15)}</style></head>
-            <body><p>Nhấn giữ ảnh để lưu về máy</p><img src="${url}"></body></html>`);
-          w.document.close();
-          this.saveSuccess = true;
-          return;
-        }
+      // iOS / Zalo in-app: show image inline for long-press save
+      // (navigator.share shows iOS share sheet, window.open blocked in Zalo)
+      if (this.isIOS || this.isZaloInApp) {
+        this.previewImageUrl = canvas.toDataURL('image/png');
+        this.saveSuccess = true;
+        return;
       }
 
       // Android / Desktop: download via <a> tag
@@ -203,45 +184,34 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   async copyAndOpenZalo(): Promise<void> {
-    if (!this.cardCapture?.nativeElement || this.saving) return;
-    this.saving = true;
-    this.saveSuccess = false;
+    if (this.saving) return;
     this.copySuccess = false;
-    this.shareSuccess = false;
 
-    try {
-      const canvas = await this.captureCanvas();
-      const blob = await this.canvasToBlob(canvas);
+    const zaloUrl = `https://zalo.me/${this.ZALO_OA_ID}`;
 
-      // Try Web Share API first (works on iOS and Android)
-      if (navigator.share) {
-        const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file] });
-          this.shareSuccess = true;
-          return;
-        }
-      }
+    // Zalo in-app: navigate directly (already inside Zalo)
+    if (this.isZaloInApp) {
+      window.location.href = zaloUrl;
+      return;
+    }
 
-      // Normal browser: copy to clipboard then open Zalo OA
+    // Open Zalo OA immediately (synchronous, before any await, so popup won't be blocked)
+    window.open(zaloUrl, '_blank');
+
+    // Try to copy image to clipboard in background
+    if (this.cardCapture?.nativeElement) {
+      this.saving = true;
       try {
+        const canvas = await this.captureCanvas();
+        const blob = await this.canvasToBlob(canvas);
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob }),
         ]);
         this.copySuccess = true;
       } catch {
-        // Clipboard not supported - download instead
-        await this.saveCardImage();
-      }
-    } catch {
-      // Canvas capture failed - still open Zalo
-    } finally {
-      this.saving = false;
-      // Always open Zalo OA page (for "Quan tâm")
-      if (!this.shareSuccess) {
-        setTimeout(() => {
-          window.open(`https://zalo.me/${this.ZALO_OA_ID}`, '_blank');
-        }, 500);
+        // Clipboard copy failed - Zalo is already open, that's OK
+      } finally {
+        this.saving = false;
       }
     }
   }
