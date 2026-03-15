@@ -26,6 +26,8 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   saving = false;
   saveSuccess = false;
   copySuccess = false;
+  showImageModal = false;
+  modalImageUrl = '';
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
@@ -159,16 +161,23 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     try {
       const canvas = await this.captureCanvas();
+
+      // Zalo in-app: blob/download URLs blocked — show modal for long-press save
+      if (this.isZaloInApp) {
+        this.modalImageUrl = canvas.toDataURL('image/png');
+        this.showImageModal = true;
+        return;
+      }
+
+      // Safari / Android / Desktop: download via <a> tag
       const blob = await this.canvasToBlob(canvas);
       const url = URL.createObjectURL(blob);
-
       const link = document.createElement('a');
       link.download = `SongMinh_${this.customerCode}.png`;
       link.href = url;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       this.saveSuccess = true;
     } catch {
@@ -176,6 +185,13 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
     } finally {
       this.saving = false;
     }
+  }
+
+  dismissImageModal(): void {
+    this.showImageModal = false;
+    this.modalImageUrl = '';
+    this.saveSuccess = true;
+    this.saving = false;
   }
 
   async copyAndOpenZalo(): Promise<void> {

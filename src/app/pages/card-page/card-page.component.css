@@ -143,6 +143,42 @@
   margin: 0;
 }
 
+.image-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.image-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.image-modal-hint {
+  font-size: 15px;
+  color: #333;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.image-modal-img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.image-modal-btn {
+  margin-top: 16px;
+}
 
 .bonus-overlay {
   position: fixed;
