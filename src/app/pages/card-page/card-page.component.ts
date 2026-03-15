@@ -161,16 +161,28 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     try {
       const canvas = await this.captureCanvas();
+      const blob = await this.canvasToBlob(canvas);
 
-      // Zalo in-app: blob/download URLs blocked — show modal for long-press save
       if (this.isZaloInApp) {
-        this.modalImageUrl = canvas.toDataURL('image/png');
+        // Zalo WebView: try Web Share API first (system share sheet → "Lưu ảnh")
+        try {
+          const file = new File([blob], `SongMinh_${this.customerCode}.png`, { type: 'image/png' });
+          if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ files: [file] });
+            this.saveSuccess = true;
+            return;
+          }
+        } catch (e: any) {
+          if (e?.name === 'AbortError') return; // user cancelled
+        }
+
+        // Fallback: show modal with blob URL for long-press save
+        this.modalImageUrl = URL.createObjectURL(blob);
         this.showImageModal = true;
         return;
       }
 
       // Safari / Android / Desktop: download via <a> tag
-      const blob = await this.canvasToBlob(canvas);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = `SongMinh_${this.customerCode}.png`;
@@ -188,6 +200,9 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   dismissImageModal(): void {
+    if (this.modalImageUrl) {
+      URL.revokeObjectURL(this.modalImageUrl);
+    }
     this.showImageModal = false;
     this.modalImageUrl = '';
     this.saveSuccess = true;
