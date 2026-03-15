@@ -26,7 +26,6 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   saving = false;
   saveSuccess = false;
   copySuccess = false;
-  previewImageUrl: string | null = null;
   showBonus = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
@@ -157,24 +156,20 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.cardCapture?.nativeElement || this.saving) return;
     this.saving = true;
     this.saveSuccess = false;
-    this.previewImageUrl = null;
 
     try {
       const canvas = await this.captureCanvas();
+      const blob = await this.canvasToBlob(canvas);
+      const url = URL.createObjectURL(blob);
 
-      // iOS / Zalo in-app: show image inline for long-press save
-      // (navigator.share shows iOS share sheet, window.open blocked in Zalo)
-      if (this.isIOS || this.isZaloInApp) {
-        this.previewImageUrl = canvas.toDataURL('image/png');
-        this.saveSuccess = true;
-        return;
-      }
-
-      // Android / Desktop: download via <a> tag
       const link = document.createElement('a');
       link.download = `SongMinh_${this.customerCode}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = url;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       this.saveSuccess = true;
     } catch {
       // silently fail

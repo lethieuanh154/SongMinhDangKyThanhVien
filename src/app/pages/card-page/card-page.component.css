@@ -143,17 +143,6 @@
   margin: 0;
 }
 
-.preview-section {
-  text-align: center;
-  margin-top: 12px;
-}
-
-.preview-image {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  margin-top: 8px;
-}
 
 .bonus-overlay {
   position: fixed;
