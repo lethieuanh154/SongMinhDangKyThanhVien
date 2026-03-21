@@ -36,6 +36,31 @@
   color: #333;
 }
 
+.password-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.password-value {
+  letter-spacing: 1px;
+}
+
+.eye-toggle {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.eye-toggle:hover {
+  opacity: 1;
+}
+
 .barcode-container {
   background: #fff;
   border-radius: 10px;

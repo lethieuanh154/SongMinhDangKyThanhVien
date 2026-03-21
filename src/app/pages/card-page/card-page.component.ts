@@ -26,6 +26,7 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
   saving = false;
   hintMessage = '';
   showBonus = false;
+  showPassword = false;
   confettiPieces = Array.from({ length: 30 }, (_, i) => i);
   isZaloInApp = false;
   private isIOS = false;
@@ -269,6 +270,10 @@ export class CardPageComponent implements OnInit, OnDestroy, AfterViewChecked {
       clearTimeout(this.bonusTimer);
       this.bonusTimer = null;
     }
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   registerNew(): void {
